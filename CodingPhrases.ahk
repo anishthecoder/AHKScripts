@@ -14,6 +14,8 @@ SetTitleMatchMode, 2
 		FormatTime, CurrentDateTime,, yyyy-MM-dd hh:mm
 		SendInput %CurrentDateTime%,
 	return
+	
+	::#me::Anish V. Abraham
 
 
 #IfWinActive
