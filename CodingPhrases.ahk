@@ -14,6 +14,11 @@ SetTitleMatchMode, 2
 		FormatTime, CurrentDateTime,, yyyy-MM-dd hh:mm
 		SendInput %CurrentDateTime%,
 	return
+
+	::#date::
+		FormatTime, CurrentDate,, yyyy-MM-dd
+		SendInput %CurrentDate%,
+	return 
 	
 	::#me::Anish V. Abraham
 
