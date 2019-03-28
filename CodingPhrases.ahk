@@ -3,6 +3,7 @@
 ; Add code editing environments below.
 GroupAdd, CodeEditors, Eclipse
 GroupAdd, CodeEditors, Notepad
+GroupAdd, CodeEditors, Code
 
 
 ; Match window titles where any part of the search phrase is available in the 
@@ -10,6 +11,19 @@ GroupAdd, CodeEditors, Notepad
 SetTitleMatchMode, 2
 
 #IfWinActive ahk_group CodeEditors
+
+	<^<+PrintScreen::
+		InputBox, command, Enter command, Enter command:
+		if (command = "addrevline")
+		{
+			addRevisionHistoryLine()
+		}
+		else 
+		{
+			MsgBox, Command not recognized.
+		}
+	return
+
 	::#datetime::
 		FormatTime, CurrentDateTime,, yyyy-MM-dd hh:mm
 		SendInput %CurrentDateTime%,
@@ -50,14 +64,11 @@ SetTitleMatchMode, 2
 		Send {Esc}elly$
 		return
 	}
-	::#copyver::
-		copyVersion()
-	return
 
 	; Add line in revision history
 	addRevisionHistoryLine()
 	{
-		SetKeyDelay 25
+		SetKeyDelay 50
 		incrementVersion()
 		Sleep, 100
 		copyVersion()
@@ -69,8 +80,5 @@ SetTitleMatchMode, 2
 		Send {Space}{Esc}pa{,} Anish V. Abraham:{Space}
 		SetKeyDelay 0
 	}
-	::#addrevline::
-		addRevisionHistoryLine()
-	return
 
 #IfWinActive
