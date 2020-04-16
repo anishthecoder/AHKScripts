@@ -1,5 +1,8 @@
 ; Phrases that are intended to be auto-completed within coding environments.
 
+; Globals
+lineDelay := 150
+
 ; Add code editing environments below.
 GroupAdd, CodeEditors, Eclipse
 GroupAdd, CodeEditors, Notepad
@@ -14,9 +17,10 @@ SetTitleMatchMode, 2
 
 	<^<+PrintScreen::
 		InputBox, command, Enter command, Enter command:
-		if (command = "addrevline")
+		if (RegExMatch(command, "^addrevline:") > 0)
 		{
-			addRevisionHistoryLine()
+			semvarLvl := SubStr(command, StrLen("addrevline:" + 1))
+			addRevisionHistoryLine(semvarLvl)
 		}
 		else 
 		{
@@ -24,9 +28,25 @@ SetTitleMatchMode, 2
 		}
 	return
 
+	::#authorme::@author Anish V. Abraham &lt;anish@asterotechnologies.com&gt;
+
+	::#date::
+		sendDate()
+	return 
+	
 	::#datetime::
 		FormatTime, CurrentDateTime,, yyyy-MM-dd hh:mm
 		SendInput %CurrentDateTime%,
+	return
+
+	::#me::Anish V. Abraham
+
+	::#modcopyright::All modifications are copyright 2019 Astero Technologies LLC. All rights to modifications are reserved.
+
+	::#note::<b>NOTE:</b>
+
+	::#v1::@version 0.1.0
+
 	return
 
 	sendDate()
@@ -34,51 +54,82 @@ SetTitleMatchMode, 2
 		FormatTime, CurrentDate,, yyyy-MM-dd
 		SendInput %CurrentDate%,
 	}
-	::#date::
-		sendDate()
-	return 
-	
-	::#me::Anish V. Abraham
 
-	::#authorme::@author Anish V. Abraham &lt;anish@asterotechnologies.com&gt;
-
-	::#v1::@version 0.0.1
-
-	; Increment version number (patch level)
-	incrementVersion()
+	; Increment version number 
+	; semvarLvl = 'major' | 'minor' | 'patch'
+	incrementVersion(semvarLvl)
 	{
-		Send {Esc}{Esc}gg/version
-		Sleep, 100
-		Send {Enter}$^a:w{Enter}
+		Send {Esc}{Esc}gg/\@version
+		Sleep, lineDelay
+		Send {Enter}$
+		Sleep, lineDelay
+
+		if (semvarLvl = "major") {
+			loopCount := 2
+		}
+		else if (semvarLvl = "minor") {
+			loopCount := 1
+		}
+		else if (semvarLvl = "patch") {
+			loopCount := 0
+		}
+
+		Loop %loopCount% {
+			Send bb
+			Sleep, lineDelay
+		}
+		Send ^a
+		Sleep, lineDelay
+		Loop %loopCount% {
+			resetNextVersionLevel()
+		}
+
+		Sleep, lineDelay
+		Send :w{Enter}
+		Sleep, lineDelay
+		Sleep, lineDelay
 		return
 	}
-	::#vinc::
-		incrementVersion()
-	return
 
 	; Copy current version number
 	copyVersion()
 	{
-		Send {Esc}{Esc}gg/version{Enter}
-		Sleep, 100
+		Send {Esc}{Esc}gg/\@version{Enter}
+		Sleep, lineDelay
 		Send {Esc}elly$
 		return
 	}
 
-	; Add line in revision history
-	addRevisionHistoryLine()
+	; Add line in revision history.
+	; semvarLvl = 'major' | 'minor' | 'patch'
+	addRevisionHistoryLine(semvarLvl)
 	{
-		SetKeyDelay 50
-		incrementVersion()
-		Sleep, 100
+		SetKeyDelay 100
+		incrementVersion(semvarLvl)
+		Sleep, lineDelay
 		copyVersion()
 		Send {Esc}{Esc}gg/REVISION HISTORY{Enter}
-		Sleep, 100
+		Sleep, lineDelay
 		Send o{Enter}
 		sendDate()
-		Sleep, 100
+		Sleep, lineDelay
 		Send {Space}{Esc}pa{,} Anish V. Abraham:{Space}
 		SetKeyDelay 0
+	}
+
+	; Reset the version number of the next version level to zero. 
+	; If the cursor is currently on the major version, then the minor is reset 
+	; to zero.
+	resetNextVersionLevel()
+	{
+		Send ww
+		Sleep, lineDelay
+		Send cw
+		Sleep, lineDelay
+		Send 0
+		Sleep, lineDelay
+		Send {Esc}{Esc}
+		Sleep, lineDelay
 	}
 
 #IfWinActive
