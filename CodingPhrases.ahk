@@ -7,129 +7,166 @@ lineDelay := 150
 GroupAdd, CodeEditors, Eclipse
 GroupAdd, CodeEditors, Notepad
 GroupAdd, CodeEditors, Code
+GroupAdd, CodeEditors, ahk_exe phpstorm64.exe
+GroupAdd, CodeEditors, Obsidian
 
 
 ; Match window titles where any part of the search phrase is available in the 
 ; window title.
 SetTitleMatchMode, 2
 
+; Phrases ----------------------------------------------------------------------
 #IfWinActive ahk_group CodeEditors
 
-	<^<+PrintScreen::
-		InputBox, command, Enter command, Enter command:
-		if (RegExMatch(command, "^addrevline:") > 0)
-		{
-			semvarLvl := SubStr(command, StrLen("addrevline:" + 1))
-			addRevisionHistoryLine(semvarLvl)
-		}
-		else 
-		{
-			MsgBox, Command not recognized.
-		}
-	return
+<^<+PrintScreen::
+  InputBox, command, Enter command, Enter command:
+  if (RegExMatch(command, "^addrevline:") > 0)
+  {
+    semvarLvl := SubStr(command, StrLen("addrevline:" + 1))
+    addRevisionHistoryLine(semvarLvl)
+  }
+  else 
+  {
+    MsgBox, Command not recognized.
+  }
+return
 
-	::#authorme::@author Anish V. Abraham &lt;anish@asterotechnologies.com&gt;
+::#authorme::@author Anish V. Abraham &lt;anish@asterotechnologies.com&gt;
 
-	::#date::
-		sendDate()
-	return 
-	
-	::#datetime::
-		FormatTime, CurrentDateTime,, yyyy-MM-dd hh:mm
-		SendInput %CurrentDateTime%,
-	return
+::#backtotopmd::
+  Send {Backspace}
+  SendRaw [Back to top](#top){:class="btn btn-sm btn-mod btn-outline-primary"}
+  Send {Enter}
+  SendRaw {:class="text-right smooth-scroll"}
+return
 
-	::#me::Anish V. Abraham
+::#date::
+  sendDate()
+return 
+  
+::#datetime::
+  FormatTime, CurrentDateTime,, yyyy-MM-dd hh:mm
+  SendInput %CurrentDateTime%,
+return
 
-	::#modcopyright::All modifications are copyright 2019 Astero Technologies LLC. All rights to modifications are reserved.
+::#fulldate::
+  FormatTime, CurrentDateTime,, dddd, MMMM d, yyyy
+  SendInput %CurrentDateTime%,
+return
 
-	::#note::<b>NOTE:</b>
+::#me::Anish V. Abraham
 
-	::#v1::@version 0.1.0
+::#modcopyright::
+  SendInput Modifications Copyright 
+  FormatTime, CurrentDateTime,, yyyy
+  SendInput {Space}(c) %CurrentDateTime%,{Space}
+  SendInput Astero Technologies LLC. All rights to modifications are reserved.
+return
 
-	return
+::#note::<b>NOTE:</b>
 
-	sendDate()
-	{
-		FormatTime, CurrentDate,, yyyy-MM-dd
-		SendInput %CurrentDate%,
-	}
+::#psfstr::public static final String
 
-	; Increment version number 
-	; semvarLvl = 'major' | 'minor' | 'patch'
-	incrementVersion(semvarLvl)
-	{
-		Send {Esc}{Esc}gg/\@version
-		Sleep, lineDelay
-		Send {Enter}$
-		Sleep, lineDelay
+::#v1::@version 0.1.0
 
-		if (semvarLvl = "major") {
-			loopCount := 2
-		}
-		else if (semvarLvl = "minor") {
-			loopCount := 1
-		}
-		else if (semvarLvl = "patch") {
-			loopCount := 0
-		}
+return
 
-		Loop %loopCount% {
-			Send bb
-			Sleep, lineDelay
-		}
-		Send ^a
-		Sleep, lineDelay
-		Loop %loopCount% {
-			resetNextVersionLevel()
-		}
+sendDate()
+{
+  FormatTime, CurrentDate,, yyyy-MM-dd
+  SendInput %CurrentDate%,
+}
 
-		Sleep, lineDelay
-		Send :w{Enter}
-		Sleep, lineDelay
-		Sleep, lineDelay
-		return
-	}
+; Increment version number 
+; semvarLvl = 'major' | 'minor' | 'patch'
+incrementVersion(semvarLvl)
+{
+  Send {Esc}{Esc}gg/@version
+  Sleep, lineDelay
+  Send {Enter}$
+  Sleep, lineDelay
 
-	; Copy current version number
-	copyVersion()
-	{
-		Send {Esc}{Esc}gg/\@version{Enter}
-		Sleep, lineDelay
-		Send {Esc}elly$
-		return
-	}
+  if (semvarLvl = "major") {
+    loopCount := 2
+  }
+  else if (semvarLvl = "minor") {
+    loopCount := 1
+  }
+  else if (semvarLvl = "patch") {
+    loopCount := 0
+  }
 
-	; Add line in revision history.
-	; semvarLvl = 'major' | 'minor' | 'patch'
-	addRevisionHistoryLine(semvarLvl)
-	{
-		SetKeyDelay 100
-		incrementVersion(semvarLvl)
-		Sleep, lineDelay
-		copyVersion()
-		Send {Esc}{Esc}gg/REVISION HISTORY{Enter}
-		Sleep, lineDelay
-		Send o{Enter}
-		sendDate()
-		Sleep, lineDelay
-		Send {Space}{Esc}pa{,} Anish V. Abraham:{Space}
-		SetKeyDelay 0
-	}
+  Loop %loopCount% {
+    Send bb
+    Sleep, lineDelay
+  }
+  Send ^a
+  Sleep, lineDelay
+  Loop %loopCount% {
+    resetNextVersionLevel()
+  }
 
-	; Reset the version number of the next version level to zero. 
-	; If the cursor is currently on the major version, then the minor is reset 
-	; to zero.
-	resetNextVersionLevel()
-	{
-		Send ww
-		Sleep, lineDelay
-		Send cw
-		Sleep, lineDelay
-		Send 0
-		Sleep, lineDelay
-		Send {Esc}{Esc}
-		Sleep, lineDelay
-	}
+  Sleep, lineDelay
+  Send :w{Enter}
+  Sleep, lineDelay
+  Sleep, lineDelay
+  Sleep, lineDelay
+  Sleep, lineDelay
+  return
+}
 
+; Copy current version number
+copyVersion()
+{
+  Send {Esc}{Esc}gg/@version{Enter}
+  Sleep, lineDelay
+  Send {Esc}elly$
+  return
+}
+
+; Add line in revision history.
+; semvarLvl = 'major' | 'minor' | 'patch'
+addRevisionHistoryLine(semvarLvl)
+{
+  SetKeyDelay 100
+  incrementVersion(semvarLvl)
+  Sleep, lineDelay
+  copyVersion()
+  Send {Esc}{Esc}gg/REVISION HISTORY{Enter}
+  Sleep, lineDelay
+  Send o{Enter}
+  sendDate()
+  Sleep, lineDelay
+  Send {Space}{Esc}pa{,} Anish V. Abraham:{Space}
+  SetKeyDelay 0
+}
+
+; Reset the version number of the next version level to zero. 
+; If the cursor is currently on the major version, then the minor is reset 
+; to zero.
+resetNextVersionLevel()
+{
+  Send ww
+  Sleep, lineDelay
+  Send cw
+  Sleep, lineDelay
+  Send 0
+  Sleep, lineDelay
+  Send {Esc}{Esc}
+  Sleep, lineDelay
+}
+
+; All Other Windows ------------------------------------------------------------
 #IfWinActive
+
+; Make active window semi-transparent.
+<!<^<+T::
+  WinGetActiveTitle, title
+  WinGet, transparency, Transparent, %title%
+  if (transparency < 255) {
+    WinSet, Transparent , 255, %title%
+  }
+  else {
+    WinSet, Transparent , 160, %title%
+  }
+return
