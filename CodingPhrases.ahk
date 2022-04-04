@@ -40,6 +40,35 @@ return
   SendRaw {:class="text-right smooth-scroll"}
 return
 
+::#badgedangermd::
+  Send {Backspace}
+  SendRaw {:class="badge badge-danger"}
+return
+::#badgedark::
+  Send {Backspace}
+  SendRaw {:class="badge badge-dark"}
+return
+::#badgeinfomd::
+  Send {Backspace}
+  SendRaw {:class="badge badge-info"}
+return
+::#badgelightmd::
+  Send {Backspace}
+  SendRaw {:class="badge badge-light"}
+return
+::#badgeprimary::
+  Send {Backspace}
+  SendRaw {:class="badge badge-primary"}
+return
+::#badgesecondary::
+  Send {Backspace}
+  SendRaw {:class="badge badge-secondary"}
+return
+::#badgewarning::
+  Send {Backspace}
+  SendRaw {:class="badge badge-warning"}
+return
+
 ::#date::
   sendDate()
 return 
